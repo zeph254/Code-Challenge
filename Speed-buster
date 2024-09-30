@@ -1,0 +1,17 @@
+    // speed  buster?
+    
+    if (speed<=70) {
+        console.log("OK"); 
+    }
+    else if (speed>=71 && speed<=73) {
+        console.log("3 points");
+    }
+    else if (speed>=74 && speed<=76) {
+        console.log("6 points");
+    }
+    else if (speed>=77 && speed<=79) {
+        console.log("9 points");
+    }
+    else(speed>=80);{
+        console.log("12 points");
+    }

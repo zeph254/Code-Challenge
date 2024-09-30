@@ -1,0 +1,16 @@
+// student grading system?
+
+ if (Score<40) {
+   console.log('Grade E'); 
+    }
+else if (Score>=40 && Score <=49) {
+        console.log("Grade D"); 
+    }
+    else if (Score>=50 && Score<=59) {
+        console.log("Grade C");
+    }
+    else if (Score>=60 && Score<=79) {
+        console.log("Grade B"); 
+    }
+    else (Score>=80);{
+        console.log("Grade A");  }
