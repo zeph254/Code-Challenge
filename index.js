@@ -1,114 +1,99 @@
+const readline = require("readline");
 
-    // tax collection
-    // CALCULATE PAYEE TAX based on taxable income and tax brckets
-    
-        function calculatePAYE(taxableIncome) {
-            // PAYE rates in effect from 1 July 2023:
-            const taxRates = [
-              { lowerLimit: 0, upperLimit: 24000, rate: 10.0 },          // 10% for income up to 24,000
-              { lowerLimit: 24001, upperLimit: 32333, rate: 25.0 },      // 25% for income between 24,001 and 32,333
-              { lowerLimit: 32334, upperLimit: 500000, rate: 30.0 },     // 30% for income between 32,334 and 500,000
-              { lowerLimit: 500001, upperLimit: 800000, rate: 32.5 },    // 32.5% for income between 500,001 and 800,000
-              { lowerLimit: 800001, upperLimit: Infinity, rate: 35.0 }   // 35% for income above 800,000
-            ];
-            //PAYE (Tax) = Calculated using PAYE tax brackets
-              let tax = 0; // Initialize the tax variable to 0
-              for (const cell of taxRates) {
-                // Check if the taxable income falls within the current bracket
-                if (taxableIncome <= cell.upperLimit) {
-                   // Calculate the tax for the income within this bracket
-                  tax += (taxableIncome - cell.lowerLimit) * cell.rate / 100;
-                  break;// Exit the loop once the applicable bracket is found
-                } else {
-                   // Calculate the tax for the full range of the current bracket
-                  tax += (cell.upperLimit - cell.lowerLimit) * cell.rate / 100;
-          
-                }
-              }
-          
-              return tax;// Return the calculated tax amount
-            }
-          
-            // Function to calculate NHIF rates in effect from 1 April 2015 based on gross salary
-            function calculateNHIF(grossSalary) {
-              const nhifRates = [
-                { lowerLimit: 0, upperLimit: 5999, rate: 150 },
-                { lowerLimit: 6000, upperLimit: 7999, rate: 300 },
-                { lowerLimit: 8000, upperLimit: 11999, rate: 400 },
-                { lowerLimit: 12000, upperLimit: 14999, rate: 500 },
-                { lowerLimit: 15000, upperLimit: 19999, rate: 600 },
-                { lowerLimit: 20000, upperLimit: 24999, rate: 750 },
-                { lowerLimit: 25000, upperLimit: 29999, rate: 850 },
-                { lowerLimit: 30000, upperLimit: 34999, rate: 900 },
-                { lowerLimit: 35000, upperLimit: 39999, rate: 950 },
-                { lowerLimit: 40000, upperLimit: 44999, rate: 1000 },
-                { lowerLimit: 45000, upperLimit: 49999, rate: 1100 },
-                { lowerLimit: 50000, upperLimit: 59999, rate: 1200 },
-                { lowerLimit: 60000, upperLimit: 69999, rate: 1300 },
-                { lowerLimit: 70000, upperLimit: 79999, rate: 1400 },
-                { lowerLimit: 80000, upperLimit: 89999, rate: 1500 },
-                { lowerLimit: 90000, upperLimit: 99999, rate: 1600 },
-                { lowerLimit: 100000, upperLimit: Infinity, rate: 1700 }
-              ];
-          
-              for (const bracket of nhifRates) {
-                  // If gross salary falls within the current bracket, return the corresponding rate
-                if (grossSalary <= bracket.upperLimit) {
-                  return bracket.rate;
-                }
-              }
-              return 0; //fallback if no bracket matches (shouldn't happen with valid input
-            }
-          
-            // Function to calculate NSSF deductions based on gross salary
-            function calculateNSSF(grossSalary) {
-              const nssfRate = 0.06; // 6% of gross salary
-              const nssfMax = 18000;  // The maximum salary considered for NSSF contribution
-              // Calculate NSSF as 6% of gross salary, capped at the maximum NSSF contribution
-              return Math.min(grossSalary, nssfMax) * nssfRate;
-            }
-           // Function to calculate the housing levy (1.5% of gross salary)
-          function calculateHousingLevy(grossSalary) {
-            const housingLevyRate = 0.015;  // 1.5% housing levy
-             // Calculate housing levy based on gross salary
-            return grossSalary * housingLevyRate;
-          }
-            // Function to calculate net salary
-            function calculateNetSalary(basicSalary, benefits) {
-              // Calculate gross salary by adding basic salary and benefits
-              const grossSalary = basicSalary + benefits;
-              // Calculate deductions
-            const nssfDeduction = calculateNSSF(grossSalary);  // NSSF
-            const nhifDeduction = calculateNHIF(grossSalary);  // NHIF
-            const taxableIncome = grossSalary - nssfDeduction; // Taxable Income after NSSF
-            const payee = calculatePAYE(taxableIncome);        // PAYE
-            const housingLevy = calculateHousingLevy(grossSalary); // Housing Levy
-          
-            // Calculate net salary by subtracting all deductions from gross salary
-            const netSalary = grossSalary - payee - nhifDeduction - nssfDeduction - housingLevy;
-          
-            return {
-              grossSalary,
-              taxableIncome,
-              payee,
-              nhifDeduction,
-              nssfDeduction,
-              housingLevy,
-              netSalary
-            };
-          }
-          
-            // for instance lets say the :
-            const basicSalary = 50000;
-            const benefits = 5000;
-          
-            const salaryBreakdown = calculateNetSalary(basicSalary, benefits);
-          
-          console.log("Gross Salary:", salaryBreakdown.grossSalary);
-          console.log("Taxable Income:", salaryBreakdown.taxableIncome);
-          console.log("PAYE (Tax):", salaryBreakdown.payee);
-          console.log("NHIF Deduction:", salaryBreakdown.nhifDeduction);
-          console.log("NSSF Deduction:", salaryBreakdown.nssfDeduction);
-          console.log("Housing Levy:", salaryBreakdown.housingLevy);
-          console.log("Net Salary:", salaryBreakdown.netSalary);    
-    
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+function calculatePAYE(basicSalary) {
+  if (basicSalary <= 24000) {
+    return 0.0;
+  } else if (basicSalary <= 32333) {
+    return (basicSalary - 24000) * 0.1;
+  } else if (basicSalary <= 40000) {
+    return (basicSalary - 32333) * 0.25 + 833.3; 
+  } else {
+    return (basicSalary - 40000) * 0.3 + 2083.3;
+  }
+}
+
+function calculateNHIF(basicSalary) {
+  if (basicSalary <= 5999) {
+    return 150;
+  } else if (basicSalary <= 7999) {
+    return 300;
+  } else if (basicSalary <= 11999) {
+    return 400;
+  } else if (basicSalary <= 14999) {
+    return 500;
+  } else if (basicSalary <= 19999) {
+    return 600;
+  } else if (basicSalary <= 24999) {
+    return 750;
+  } else if (basicSalary <= 29999) {
+    return 800;
+  } else if (basicSalary <= 34999) {
+    return 900;
+  } else if (basicSalary <= 39999) {
+    return 950;
+  } else if (basicSalary <= 44999) {
+    return 1000;
+  } else if (basicSalary <= 49999) {
+    return 1100;
+  } else if (basicSalary <= 59999) {
+    return 1200;
+  } else if (basicSalary <= 69999) {
+    return 1300;
+  } else if (basicSalary <= 79999) {
+    return 1400;
+  } else {
+    return 1500; // For 80,000 and above
+  }
+}
+
+function calculateNSSF(basicSalary) {
+  return Math.min(basicSalary * 0.06, 180); // I assumed the cap for NSSF deduction is 180
+}
+
+function calculateNetSalary(basicSalary, benefits) {
+  const grossSalary = basicSalary + benefits;
+  const payee = calculatePAYE(basicSalary);
+  const nhif = calculateNHIF(basicSalary);
+  const nssf = calculateNSSF(basicSalary);
+
+  const totalDeductions = payee + nhif + nssf;
+  const netSalary = grossSalary - totalDeductions;
+
+  return {
+    grossSalary: grossSalary,
+    payee: payee,
+    nhif: nhif,
+    nssf: nssf,
+    netSalary: netSalary,
+  };
+}
+
+// Get user input
+rl.question("Enter the basic salary: ", (basicSalaryInput) => {
+  rl.question("Enter the benefits: ", (benefitsInput) => {
+    const basicSalary = parseFloat(basicSalaryInput);
+    const benefits = parseFloat(benefitsInput);
+
+    if (!isNaN(basicSalary) && !isNaN(benefits)) {
+      const salaryInfo = calculateNetSalary(basicSalary, benefits);
+
+      console.log("\nSalary Breakdown:");
+      console.log(`Gross Salary: KSh ${salaryInfo.grossSalary.toFixed(2)}`);
+      console.log(`PAYE: KSh ${salaryInfo.payee.toFixed(2)}`);
+      console.log(`NHIF: KSh ${salaryInfo.nhif.toFixed(2)}`);
+      console.log(`NSSF: KSh ${salaryInfo.nssf.toFixed(2)}`);
+      console.log(`Net Salary: KSh ${salaryInfo.netSalary.toFixed(2)}`);
+    } else {
+      console.log(
+        "Please enter valid numerical values for salary and benefits."
+      );
+    }
+    rl.close(); // Close the readline interface
+  });
+});
+ 

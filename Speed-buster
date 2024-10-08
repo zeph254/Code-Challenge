@@ -1,5 +1,5 @@
     // speed  buster?
-    
+    let speed=130
     if (speed<=70) {
         console.log("OK"); 
     }
